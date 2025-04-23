@@ -42,6 +42,7 @@ async def embed_text(
     embed_column: str,
     strategy: dict,
     embedding_name: str,
+    user_id: str,
     id_column: str = "id",
     title_column: str | None = None,
 ):
@@ -96,6 +97,7 @@ async def embed_text(
             vector_store_config=vector_store_workflow_config,
             id_column=id_column,
             title_column=title_column,
+            doc_user_id=user_id
         )
 
     return await _text_embed_in_memory(
@@ -132,6 +134,7 @@ async def _text_embed_with_vector_store(
     strategy: dict[str, Any],
     vector_store: BaseVectorStore,
     vector_store_config: dict,
+    doc_user_id: str,
     id_column: str = "id",
     title_column: str | None = None,
 ):
@@ -199,6 +202,7 @@ async def _text_embed_with_vector_store(
                 text=doc_text,
                 vector=doc_vector,
                 attributes={"title": doc_title},
+                user_id=doc_user_id,
             )
             documents.append(document)
 
