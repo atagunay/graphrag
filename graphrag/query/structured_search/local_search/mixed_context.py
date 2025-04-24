@@ -53,6 +53,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
     def __init__(
         self,
         entities: list[Entity],
+        user_id: str,
         entity_text_embeddings: BaseVectorStore,
         text_embedder: EmbeddingModel,
         text_units: list[TextUnit] | None = None,
@@ -83,6 +84,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
         self.text_embedder = text_embedder
         self.token_encoder = token_encoder
         self.embedding_vectorstore_key = embedding_vectorstore_key
+        self.user_id = user_id
 
     def filter_by_entity_keys(self, entity_keys: list[int] | list[str]):
         """Filter entity text embeddings by entity keys."""
@@ -137,6 +139,7 @@ class LocalSearchMixedContext(LocalContextBuilder):
             query = f"{query}\n{pre_user_questions}"
 
         selected_entities = map_query_to_entities(
+            user_id= self.user_id,
             query=query,
             text_embedding_vectorstore=self.entity_text_embeddings,
             text_embedder=self.text_embedder,

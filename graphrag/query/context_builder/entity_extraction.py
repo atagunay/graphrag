@@ -36,6 +36,7 @@ class EntityVectorStoreKey(str, Enum):
 
 def map_query_to_entities(
     query: str,
+    user_id: str,
     text_embedding_vectorstore: BaseVectorStore,
     text_embedder: EmbeddingModel,
     all_entities_dict: dict[str, Entity],
@@ -55,7 +56,8 @@ def map_query_to_entities(
     if query != "":
         # get entities with highest semantic similarity to query
         # oversample to account for excluded entities
-        search_results = text_embedding_vectorstore.similarity_search_by_text(
+        search_results = text_embedding_vectorstore.similarity_search_by_text_and_user_id(
+            user_id=user_id,
             text=query,
             text_embedder=lambda t: text_embedder.embed(t),
             k=k * oversample_scaler,

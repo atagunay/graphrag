@@ -81,6 +81,7 @@ def get_local_search_engine(
         model=chat_model,
         system_prompt=system_prompt,
         context_builder=LocalSearchMixedContext(
+            user_id=config.user_id,
             community_reports=reports,
             text_units=text_units,
             entities=entities,

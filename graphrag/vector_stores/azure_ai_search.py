@@ -190,6 +190,42 @@ class AzureAISearchVectorStore(BaseVectorStore):
             for doc in response
         ]
 
+    def similarity_search_by_vector_and_user_id(
+            self, query_embedding: list[float],user_id: str, k: int = 10, **kwargs: Any
+    ) -> list[VectorStoreSearchResult]:
+        """Perform a vector-based similarity search."""
+        vectorized_query = VectorizedQuery(
+            vector=query_embedding, k_nearest_neighbors=k, fields="vector"
+        )
+
+        # Check if user_id is None or an empty string
+        if not user_id:
+            raise ValueError("User ID must be provided and cannot be an empty string.")
+
+        # Construct the filter for user_id if provided
+        filter_query = f"user_id eq '{user_id}'"
+
+        response = self.db_connection.search(
+            vector_queries=[vectorized_query],
+            filter=filter_query
+        )
+
+        return [
+            VectorStoreSearchResult(
+                document=VectorStoreDocument(
+                    id=doc.get("id", ""),
+                    text=doc.get("text", ""),
+                    vector=doc.get("vector", []),
+                    attributes=(json.loads(doc.get("attributes", "{}"))),
+                    user_id=doc.get("user_id", ""),
+                ),
+                # Cosine similarity between 0.333 and 1.000
+                # https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking#scores-in-a-hybrid-search-results
+                score=doc["@search.score"],
+            )
+            for doc in response
+        ]
+
     def similarity_search_by_text(
             self, text: str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
@@ -197,6 +233,17 @@ class AzureAISearchVectorStore(BaseVectorStore):
         query_embedding = text_embedder(text)
         if query_embedding:
             return self.similarity_search_by_vector(
+                query_embedding=query_embedding, k=k
+            )
+        return []
+
+    def similarity_search_by_text_and_user_id(
+            self, text: str, user_id: str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
+    ) -> list[VectorStoreSearchResult]:
+        """Perform a text-based similarity search."""
+        query_embedding = text_embedder(text)
+        if query_embedding:
+            return self.similarity_search_by_vector_and_user_id(
                 query_embedding=query_embedding, k=k
             )
         return []

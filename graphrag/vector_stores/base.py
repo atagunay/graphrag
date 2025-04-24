@@ -9,7 +9,7 @@ from typing import Any
 
 from graphrag.data_model.types import TextEmbedder
 
-DEFAULT_VECTOR_SIZE: int = 1536
+DEFAULT_VECTOR_SIZE: int = 3072
 
 
 @dataclass
@@ -74,10 +74,22 @@ class BaseVectorStore(ABC):
         """Perform ANN search by vector."""
 
     @abstractmethod
+    def similarity_search_by_vector_and_user_id(
+            self, query_embedding: list[float], user_id:str, k: int = 10, **kwargs: Any
+    ) -> list[VectorStoreSearchResult]:
+        """Perform ANN search by vector and user_id."""
+
+    @abstractmethod
     def similarity_search_by_text(
         self, text: str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
         """Perform ANN search by text."""
+
+    @abstractmethod
+    def similarity_search_by_text_and_user_id(
+        self, text: str, user_id:str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
+    ) -> list[VectorStoreSearchResult]:
+        """Perform ANN search by text and user_id."""
 
     @abstractmethod
     def filter_by_id(self, include_ids: list[str] | list[int]) -> Any:
