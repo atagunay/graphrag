@@ -121,7 +121,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
                         type=SearchFieldDataType.String,
                     ),
                     SimpleField(
-                        name="oids",
+                        name="user_id",
                         type=SearchFieldDataType.String,
                         filterable=True,
                         facetable=True,
@@ -205,7 +205,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
             raise ValueError("User ID must be provided and cannot be an empty string.")
 
         # Construct the filter for user_id if provided
-        filter_query = f"oids eq '{user_id}'"
+        filter_query = f"user_id eq '{user_id}'"
 
         response = self.db_connection.search(
             vector_queries=[vectorized_query],
