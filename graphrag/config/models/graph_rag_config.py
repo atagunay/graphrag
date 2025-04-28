@@ -287,9 +287,9 @@ class GraphRagConfig(BaseModel):
     )
     """The user ID."""
 
-    def _validate_user_id(self) -> None:
-        if not self.user_id:
-            msg = "User ID is required."
+    def _validate_oid(self) -> None:
+        if not self.oid:
+            msg = "User ID (oid) is required."
             raise ValueError(msg)
 
     def _validate_vector_store_db_uri(self) -> None:
