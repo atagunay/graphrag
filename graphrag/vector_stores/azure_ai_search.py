@@ -246,7 +246,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
         query_embedding = text_embedder(text)
         if query_embedding:
             return self.similarity_search_by_vector_and_oid(
-                query_embedding=query_embedding, k=k
+                query_embedding=query_embedding,oid=oid, k=k
             )
         return []
 
