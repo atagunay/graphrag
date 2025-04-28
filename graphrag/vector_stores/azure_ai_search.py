@@ -121,7 +121,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
                         type=SearchFieldDataType.String,
                     ),
                     SimpleField(
-                        name="user_id",
+                        name="oids",
                         type=SearchFieldDataType.String,
                         filterable=True,
                         facetable=True,
@@ -139,7 +139,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
                 "vector": doc.vector,
                 "text": doc.text,
                 "attributes": json.dumps(doc.attributes),
-                "user_id": doc.user_id
+                "oids": doc.oid
             }
             for doc in documents
             if doc.vector is not None
@@ -183,7 +183,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
                     text=doc.get("text", ""),
                     vector=doc.get("vector", []),
                     attributes=(json.loads(doc.get("attributes", "{}"))),
-                    user_id=doc.get("user_id", ""),
+                    oid=doc.get("oids", ""),
                 ),
                 # Cosine similarity between 0.333 and 1.000
                 # https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking#scores-in-a-hybrid-search-results
@@ -192,20 +192,20 @@ class AzureAISearchVectorStore(BaseVectorStore):
             for doc in response
         ]
 
-    def similarity_search_by_vector_and_user_id(
-            self, query_embedding: list[float],user_id: str, k: int = 10, **kwargs: Any
+    def similarity_search_by_vector_and_oid(
+            self, query_embedding: list[float],oid: str, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
         """Perform a vector-based similarity search."""
         vectorized_query = VectorizedQuery(
             vector=query_embedding, k_nearest_neighbors=k, fields="vector"
         )
 
-        # Check if user_id is None or an empty string
-        if not user_id:
+        # Check if oid is None or an empty string
+        if not oid:
             raise ValueError("User ID must be provided and cannot be an empty string.")
 
-        # Construct the filter for user_id if provided
-        filter_query = f"user_id eq '{user_id}'"
+        # Construct the filter for oid if provided
+        filter_query = f"oids eq '{oid}'"
 
         response = self.db_connection.search(
             vector_queries=[vectorized_query],
@@ -219,7 +219,7 @@ class AzureAISearchVectorStore(BaseVectorStore):
                     text=doc.get("text", ""),
                     vector=doc.get("vector", []),
                     attributes=(json.loads(doc.get("attributes", "{}"))),
-                    user_id=doc.get("user_id", ""),
+                    oid=doc.get("oids", ""),
                 ),
                 # Cosine similarity between 0.333 and 1.000
                 # https://learn.microsoft.com/en-us/azure/search/hybrid-search-ranking#scores-in-a-hybrid-search-results
@@ -239,13 +239,13 @@ class AzureAISearchVectorStore(BaseVectorStore):
             )
         return []
 
-    def similarity_search_by_text_and_user_id(
-            self, text: str, user_id: str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
+    def similarity_search_by_text_and_oid(
+            self, text: str, oid: str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
         """Perform a text-based similarity search."""
         query_embedding = text_embedder(text)
         if query_embedding:
-            return self.similarity_search_by_vector_and_user_id(
+            return self.similarity_search_by_vector_and_oid(
                 query_embedding=query_embedding, k=k
             )
         return []
@@ -258,5 +258,5 @@ class AzureAISearchVectorStore(BaseVectorStore):
             text=response.get("text", ""),
             vector=response.get("vector", []),
             attributes=(json.loads(response.get("attributes", "{}"))),
-            user_id=response.get("user_id", ""),
+            oid=response.get("oids", ""),
         )

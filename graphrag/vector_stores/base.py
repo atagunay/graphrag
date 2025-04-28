@@ -19,7 +19,7 @@ class VectorStoreDocument:
     id: str | int
     """unique id for the document"""
 
-    user_id: str
+    oid: str
     """unique user id"""
 
     text: str | None
@@ -74,10 +74,10 @@ class BaseVectorStore(ABC):
         """Perform ANN search by vector."""
 
     @abstractmethod
-    def similarity_search_by_vector_and_user_id(
-            self, query_embedding: list[float], user_id:str, k: int = 10, **kwargs: Any
+    def similarity_search_by_vector_and_oid(
+            self, query_embedding: list[float], oid:str, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
-        """Perform ANN search by vector and user_id."""
+        """Perform ANN search by vector and oid."""
 
     @abstractmethod
     def similarity_search_by_text(
@@ -86,10 +86,10 @@ class BaseVectorStore(ABC):
         """Perform ANN search by text."""
 
     @abstractmethod
-    def similarity_search_by_text_and_user_id(
-        self, text: str, user_id:str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
+    def similarity_search_by_text_and_oid(
+        self, text: str, oid:str, text_embedder: TextEmbedder, k: int = 10, **kwargs: Any
     ) -> list[VectorStoreSearchResult]:
-        """Perform ANN search by text and user_id."""
+        """Perform ANN search by text and oid."""
 
     @abstractmethod
     def filter_by_id(self, include_ids: list[str] | list[int]) -> Any:

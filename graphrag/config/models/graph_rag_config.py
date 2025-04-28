@@ -282,15 +282,10 @@ class GraphRagConfig(BaseModel):
     )
     """List of workflows to run, in execution order."""
 
-    user_id: str = Field(
+    oid: str = Field(
         description="User ID", default=""
     )
     """The user ID."""
-
-    def _validate_user_id(self) -> None:
-        if not self.user_id:
-            msg = "User ID is required."
-            raise ValueError(msg)
 
     def _validate_vector_store_db_uri(self) -> None:
         """Validate the vector store configuration."""
@@ -360,5 +355,5 @@ class GraphRagConfig(BaseModel):
         self._validate_multi_output_base_dirs()
         self._validate_update_index_output_base_dir()
         self._validate_vector_store_db_uri()
-        self._validate_user_id()
+        self._validate_oid()
         return self
